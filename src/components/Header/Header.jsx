@@ -4,21 +4,26 @@ import { Link, useNavigate } from "react-router-dom";
 import { auth } from "../../utils/firebase/firebase.utils";
 import { signOut } from "firebase/auth";
 import CartDropDown from "../cart-dropdown/CartDropdown";
+import { useDispatch, useSelector } from "react-redux";
+import { logoutUser } from "../../actions/userActions";
 
 const Header = () => {
+  const user = useSelector((state) => state.Users.userData);
   const navigate = useNavigate();
+  const dispatch= useDispatch()
 
   const handleUserLogin = useCallback(async () => {
     try {
-      if (auth.currentUser) {
+      if (user) {
         await signOut(auth);
+        dispatch(logoutUser());
+        navigate("/");
       }
 
-      navigate("/");
     } catch (error) {
       console.error(error);
     }
-  }, [navigate]);
+  }, [navigate,user]);
 
   const handleNavigateCategories = useCallback(() => {
     navigate("/categories");
@@ -26,7 +31,6 @@ const Header = () => {
 
   return (
     <div className="w-full h-[60px] shadow flex justify-between items-center px-10">
-
       <section
         onClick={handleNavigateCategories}
         className="w-[70px] cursor-pointer"
@@ -39,11 +43,10 @@ const Header = () => {
       </section>
 
       <section className="uppercase space-x-2 text-black flex items-center">
-
         <Link to="/categories">Shop</Link>
 
         <span onClick={handleUserLogin} className="cursor-pointer">
-          {auth.currentUser ? "SignOut" : "SignIn"}
+          {user ? "SignOut" : "SignIn"}
         </span>
 
         {/* cart popup */}
@@ -51,9 +54,7 @@ const Header = () => {
           <ShoppingCartIcon />
           <CartDropDown />
         </div>
-
       </section>
-
     </div>
   );
 };

@@ -45,19 +45,39 @@ const Checkout = () => {
 
             {/* quantity */}
             <div className="flex justify-center items-center gap-3">
-              <span
-                onClick={() => dispatch(decreaseQuantity(item.id))}
-                className="cursor-pointer font-bold"
-              >
-                {"<"}
-              </span>
-              <span>{item.quantity}</span>
-              <span
-                onClick={() => dispatch(addToCart(item))}
-                className="cursor-pointer font-bold"
-              >
-                {">"}
-              </span>
+             <span
+  onClick={() => dispatch(decreaseQuantity(item.id))}
+  className="
+    cursor-pointer
+    w-8 h-8
+    flex items-center justify-center
+    border
+    rounded-full
+    text-lg
+    hover:bg-gray-200
+    transition
+  "
+>
+  −
+</span>
+
+<span className="px-2">{item.quantity}</span>
+
+<span
+  onClick={() => dispatch(addToCart(item))}
+  className="
+    cursor-pointer
+    w-8 h-8
+    flex items-center justify-center
+    border
+    rounded-full
+    text-lg
+    hover:bg-gray-200
+    transition
+  "
+>
+  +
+</span>
             </div>
 
             {/* price */}

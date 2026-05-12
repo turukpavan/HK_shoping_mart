@@ -1,16 +1,15 @@
 import { composeWithDevTools } from "@redux-devtools/extension";
 import { createStore, combineReducers, applyMiddleware } from "redux";
-import { thunk } from "redux-thunk";
-
 import storage from "redux-persist/es/storage";
 import { persistReducer, persistStore } from "redux-persist";
 import { userReducer } from "./reducers/UserReducer";
 import { cartReducer } from "./reducers/CartReducer";
-
+import { categoriesReducer } from "./reducers/CategoriesReducer";
 
 const rootReducer = combineReducers({
-   Users : userReducer,
-   Cart : cartReducer
+  Users: userReducer,
+  Cart: cartReducer,
+  Categories: categoriesReducer,
 });
 
 // persist config
@@ -20,18 +19,9 @@ const persistConfig = {
 };
 
 // persisted reducer
-const persistedReducer = persistReducer(
-  persistConfig,
-  rootReducer
-);
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-
-const middleware = [thunk];
-
-export const store = createStore(
-  persistedReducer,
-  composeWithDevTools(applyMiddleware(...middleware))
-);
+export const store = createStore(persistedReducer, composeWithDevTools());
 
 // persist store
 export const persistor = persistStore(store);

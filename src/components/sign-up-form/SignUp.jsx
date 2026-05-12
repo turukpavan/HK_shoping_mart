@@ -5,6 +5,7 @@ import { auth, db } from "../../utils/firebase/firebase.utils";
 import { useNavigate } from "react-router-dom";
 import Button from "../button/Button";
 import FormInput from "../form-input/FormInput";
+import toast from "react-hot-toast";
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -13,18 +14,16 @@ const SignUp = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-
   const handleSignUp = async (e) => {
-
     e.preventDefault();
 
     if (password !== confirmPassword) {
-      alert("Passwords do not match");
+      toast.error("Passwords do not match");
+
       return;
     }
 
     try {
-
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
@@ -33,39 +32,43 @@ const SignUp = () => {
 
       const user = userCredential.user;
 
-      // store extra user data in Firestore
       await setDoc(doc(db, "users", user.uid), {
-        name: name,
-        email: email,
+        name,
+        email,
         uid: user.uid,
       });
 
-      console.log("User created:", user);
-
+      setName("");
+      setEmail("");
+      setPassword("");
+      setConfirmPassword("");
       navigate("/categories");
-
+      toast.success("Login successful");
     } catch (error) {
-      console.error(error);
+      switch (error.code) {
+        case "auth/email-already-in-use":
+          toast.error("Email already exists. Please sign in.");
+          break;
+        case "auth/invalid-email":
+          toast.error("Invalid email address");
+          break;
+        case "auth/weak-password":
+          toast.error("Password should be at least 6 characters");
+          break;
+
+        default:
+          toast.error(error.message);
+      }
     }
   };
 
   return (
-
     <div>
+      <h1 className="text-2xl font-semibold mb-2">Don't have an account?</h1>
 
-      <h1 className="text-2xl font-semibold mb-2">
-        Don't have an account?
-      </h1>
+      <p className="text-gray-500 mb-8">Sign up with your email and password</p>
 
-      <p className="text-gray-500 mb-8">
-        Sign up with your email and password
-      </p>
-
-      <form
-        onSubmit={handleSignUp}
-        className="flex flex-col gap-6"
-      >
-
+      <form onSubmit={handleSignUp} className="flex flex-col gap-6">
         <FormInput
           type="text"
           placeholder="Display Name"
@@ -94,15 +97,10 @@ const SignUp = () => {
           onChange={(e) => setConfirmPassword(e.target.value)}
         />
 
-        <Button
-          type="submit"
-          className="w-fit mt-4"
-        >
+        <Button type="submit" className="w-fit mt-4">
           SIGN UP
         </Button>
-
       </form>
-
     </div>
   );
 };

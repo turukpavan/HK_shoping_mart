@@ -6,6 +6,7 @@ import {
   useElements,
 } from "@stripe/react-stripe-js";
 import { useCallback, useState } from "react";
+import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 
 
@@ -53,16 +54,15 @@ const CheckoutForm = ({amount}) => {
     );
 
     if (result.error) {
-      console.log(result.error.message);
-      alert(result.error.message);
+      toast.error(result.error)
     } else if (
       result.paymentIntent.status === "succeeded"
     ) {
       dispatch(clearCart());
-      alert("Payment Successful ");
+      toast.success("Payment Successful ");
     }
   } catch (error) {
-    console.log(error.message);
+      toast.error(error.message)
   } finally {
     setLoading(false);
   }

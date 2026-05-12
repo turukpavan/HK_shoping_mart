@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { auth, googleProvider } from "../../utils/firebase/firebase.utils";
 import FormInput from "../form-input/FormInput";
 import Button from "../button/Button";
-
+import toast from "react-hot-toast";
 const SignIn = () => {
   const navigate = useNavigate();
 
@@ -22,25 +22,31 @@ const SignIn = () => {
         password,
       );
 
-      console.log("Logged in user:", userCredential.user);
+      toast.success("Login successful ✅");
       navigate("/categories");
     } catch (error) {
-      console.error(error);
+       if (error.code === "auth/invalid-credential") {
+      toast.error("Invalid credential");
+  } else {
+      toast.error("Login Fails");
+  }
+      setEmail("");
+      setPassword("")
     }
   };
 
   // GOOGLE LOGIN
   const signInWithGoogle = async () => {
-    try {
-      const result = await signInWithPopup(auth, googleProvider);
-
-      console.log("Google user:", result.user);
+  try {
+    await signInWithPopup(auth, googleProvider);
+          toast.success("Login successful ✅");
 
       navigate("/categories");
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  } catch (error) {
+          toast.error(error.message);
+
+  }
+};
 
   return (
     <div>

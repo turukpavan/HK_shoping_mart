@@ -1,35 +1,64 @@
-import React, { useContext, memo } from "react";
+import React, { memo } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "../button/Button";
 import { useSelector } from "react-redux";
 
 const CartDropDown = () => {
-  const cartItems = useSelector(state=>state.Cart.cartItems);
+  const cartItems = useSelector((state) => state.Cart.cartItems);
   const navigate = useNavigate();
+
   return (
-    <div className="absolute shadow-2xl h-60 w-50 left-[-150px] z-10 bg-white border p-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
-      <div className="overflow-scroll h-45">
-       {cartItems.map((pro)=>(
-         <div key={pro.id} className="flex justify-around shadow mb-3">
-          <div className="w-[40px] h-[40px]">
-            <img className="w-[100%] h-[100%]" src={pro.imageUrl} alt="" />
-          </div>
+    <div
+      className="
+        absolute left-[-150px] z-20
+         bg-white border shadow-2xl rounded-md p-3
+        opacity-0 invisible
+        group-hover:opacity-100 group-hover:visible
+        transition-all duration-300
+      "
+    >
+      {/* CART ITEMS */}
+      <div
+        className="
+          max-h-48
+          overflow-y-auto
+          pr-2
+        "
+      >
+        {cartItems.length ? (
+          cartItems.map((pro) => (
+            <div
+              key={pro.id}
+              className="flex items-center gap-3 mb-3 border-b pb-2"
+            >
+              <img
+                className="w-10 h-10 object-cover rounded"
+                src={pro.imageUrl}
+                alt={pro.name}
+              />
 
-          <div className=" text-xs">
-            <p>{pro.name}</p>
-            <p>{pro.quantity} X ${pro.price}</p>
-          </div>
-        </div>
-       ))}
+              <div className="text-xs">
+                <p className="font-semibold">{pro.name}</p>
+                <p>
+                  {pro.quantity} × ${pro.price}
+                </p>
+              </div>
+            </div>
+          ))
+        ) : (
+          <p className="text-center text-gray-500 text-sm">
+            Your cart is empty
+          </p>
+        )}
       </div>
 
-      <div>
-        <Button onClick={()=>navigate('/checkout')} className=" h-10 text-sm" >
+      {/* BUTTON */}
+      <Button
+        onClick={() => navigate("/checkout")}
+        className="w-full h-10 text-[10px] mt-3"
+      >
         GO TO CHECKOUT
-
-        </Button>
-       
-      </div>
+      </Button>
     </div>
   );
 };

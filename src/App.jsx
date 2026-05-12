@@ -11,31 +11,23 @@ import ProtectedRoute from "./routes/protectedRoute/ProtectedRoute ";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import { useDispatch } from "react-redux";
-
+import { Toaster } from "react-hot-toast";
 const App = () => {
-
-  
-
   const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
   return (
     <div>
-
-      {/* <UserProvider> */}
-        {/* <CartContext> */}
-          <Header />
+      <Toaster position="top-right"/>
+      <Header />
       <Elements stripe={stripePromise}>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route element={<ProtectedRoute />}>
-              <Route path="/categories" element={<CategoriesPreview />} />
-              <Route path="categories/shop/:category" element={<Shop />} />
-              <Route path="/checkout" element={<Checkout />} />
-            </Route>
-          </Routes>
-            </Elements>
-        {/* </CartContext> */}
-      {/* </UserProvider> */}
-
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="/categories" element={<CategoriesPreview />} />
+            <Route path="categories/shop/:category" element={<Shop />} />
+            <Route path="/checkout" element={<Checkout />} />
+          </Route>
+        </Routes>
+      </Elements>
     </div>
   );
 };

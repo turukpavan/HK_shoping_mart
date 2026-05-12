@@ -1,9 +1,10 @@
 import React from 'react'
-import { categoriesData } from '../../db/categoriesData'; 
-import { useNavigate } from 'react-router-dom'
 import CategoryCard from '../../components/category-card/CategoryCard';
+import { useSelector } from 'react-redux';
 const CategoriesPreview = () => {
-  const navigate = useNavigate();
+  const categoriesData = useSelector(state=>state.Categories.categories);
+  
+  
   return (
     <div className='px-10 py-10 '>
         <div className='grid grid-cols-3 gap-2'>
