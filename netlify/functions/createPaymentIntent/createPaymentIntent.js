@@ -2,7 +2,7 @@ import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-export const handler = async (event) => {
+export const createPaymentIntent = async (event) => {
   try {
     const { amount } = JSON.parse(event.body || "{}");
 
