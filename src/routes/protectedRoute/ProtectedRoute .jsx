@@ -30,7 +30,7 @@ const ProtectedRoute = () => {
     return unsubscribe;
   }, [dispatch]);
 
-  // ⛔ Wait until firebase checks auth
+  //  Wait until firebase checks auth
   if (loading)
   return (
     <div className="flex items-center justify-center h-screen">
