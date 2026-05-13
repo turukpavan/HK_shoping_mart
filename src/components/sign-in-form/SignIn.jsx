@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { auth, googleProvider } from "../../utils/firebase/firebase.utils";
@@ -10,6 +10,8 @@ const SignIn = () => {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+ 
 
   // EMAIL + PASSWORD LOGIN
   const handleSignIn = async (e) => {
@@ -68,6 +70,7 @@ const SignIn = () => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
+
 
         <div className="flex gap-4 mt-4">
           <Button type="submit">SIGN IN</Button>

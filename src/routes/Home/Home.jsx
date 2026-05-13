@@ -1,9 +1,21 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import SignIn from '../../components/sign-in-form/SignIn'
 import SignUp from '../../components/sign-up-form/SignUp'
+import toast from 'react-hot-toast';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 
 const Home = () => {
+  const user = useSelector((state) => state.Users.userData);
+const navigate = useNavigate()
+       useEffect(()=>{
+         if (user) {
+          navigate("/categories");
+        }
+       },[])
+  
+      
   return (
 
     <div className='w-full flex justify-center mt-10'>
