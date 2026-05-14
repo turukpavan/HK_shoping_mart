@@ -5,17 +5,17 @@ export const addToCart = (product) => {
   };
 };
 
-export const removeFromCart = (id) => {
+export const removeFromCart = (obj) => {
   return {
     type: "REMOVE_FROM_CART",
-    payload: id,
+    payload: obj,
   };
 };
 
-export const decreaseQuantity = (id) => {
+export const decreaseQuantity = (obj) => {
   return {
     type: "DECREASE_QUANTITY",
-    payload: id,
+    payload: obj,
   };
 };
 

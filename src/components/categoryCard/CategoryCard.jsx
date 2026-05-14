@@ -1,8 +1,8 @@
-import React,{memo} from "react";
+import { memo } from "react";
 import { useNavigate } from "react-router-dom";
 
-const CategoryCard = ({categoriesData}) => {
-    const navigate = useNavigate()
+const CategoryCard = ({ categoriesData = [] }) => {
+  const navigate = useNavigate();
   return (
     <>
       {categoriesData.map((category) => (

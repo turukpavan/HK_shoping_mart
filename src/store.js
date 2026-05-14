@@ -1,10 +1,10 @@
 import { composeWithDevTools } from "@redux-devtools/extension";
-import { createStore, combineReducers, applyMiddleware } from "redux";
+import { createStore, combineReducers } from "redux";
 import storage from "redux-persist/es/storage";
 import { persistReducer, persistStore } from "redux-persist";
-import { userReducer } from "./reducers/UserReducer";
-import { cartReducer } from "./reducers/CartReducer";
-import { categoriesReducer } from "./reducers/CategoriesReducer";
+import { categoriesReducer } from "./redux/reducers/CategoriesReducer";
+import { userReducer } from "./redux/reducers/UserReducer";
+import { cartReducer } from "./redux/reducers/CartReducer";
 
 const rootReducer = combineReducers({
   Users: userReducer,

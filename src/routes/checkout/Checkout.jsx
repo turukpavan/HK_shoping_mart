@@ -1,5 +1,4 @@
-import RemoveShoppingCartIcon from '@mui/icons-material/RemoveShoppingCart';
-import React, { useCallback, useEffect, useMemo } from "react";
+import RemoveShoppingCartIcon from "@mui/icons-material/RemoveShoppingCart";
 import CloseIcon from "@mui/icons-material/Close";
 import CheckoutForm from "../../components/checkoutform/CheckoutForm";
 import { useDispatch, useSelector } from "react-redux";
@@ -7,36 +6,40 @@ import {
   addToCart,
   decreaseQuantity,
   removeFromCart,
-} from "../../actions/cartAction";
+} from "../../redux/actions/cartAction";
 import Button from "../../components/button/Button";
 import { useNavigate } from "react-router-dom";
+import {
+  selectCartTotal,
+  selectUserCartItems,
+} from "../../redux/selectors/cartSelectors";
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
 
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 const Checkout = () => {
-  const navigate = useNavigate()
-  const user = useSelector((state) => state.Users.userData);
-  const cartData = useSelector((state) => state.Cart.cartItems);
-  const cartItems = cartData.filter((cartitem) => cartitem.uid == user?.uid);
-
+  const navigate = useNavigate();
+  const cartItems = useSelector(selectUserCartItems);
   const dispatch = useDispatch();
-  const totalPrice = useMemo(
-    () =>
-      cartItems.reduce((total, item) => total + item.price * item.quantity, 0),
-    [cartItems],
-  );
+  const totalPrice = useSelector(selectCartTotal);
+  const user = useSelector((state) => state.Users.userData);
 
-  if (cartItems.length == 0) {
+  if (cartItems.length === 0) {
     return (
-      <>
-        <div className=" w-[100vw] h-[80vh] flex flex-col items-center justify-center gap-5">
-            <div>
-                <RemoveShoppingCartIcon sx={{ fontSize: 150 }} />
-                <h1 className="uppercase font-bold mt-10">Your Cart is Empty!</h1>
-            </div>
-          <Button onClick={()=>navigate('/categories')} className="w-[200px]" type="button" bg="bg-blue-500">
-            Shop Now
-          </Button>
+      <div className=" w-full min-h-[80vh] flex flex-col items-center justify-center gap-5">
+        <div>
+          <RemoveShoppingCartIcon sx={{ fontSize: 150 }} />
+          <h1 className="uppercase font-bold mt-10">Your Cart is Empty!</h1>
         </div>
-      </>
+        <Button
+          onClick={() => navigate("/categories")}
+          className="w-[200px]"
+          type="button"
+          bg="bg-blue-500"
+        >
+          Shop Now
+        </Button>
+      </div>
     );
   }
 
@@ -72,25 +75,18 @@ const Checkout = () => {
 
             {/* quantity */}
             <div className="flex justify-center items-center gap-3">
-              <span
-                onClick={() => dispatch(decreaseQuantity(item.id))}
-                className="
-    cursor-pointer
-    w-8 h-8
-    flex items-center justify-center
-    border
-    rounded-full
-    text-lg
-    hover:bg-gray-200
-    transition
-  "
+              <button
+                onClick={() =>
+                  dispatch(decreaseQuantity({ id: item.id, uid: user.uid }))
+                }
+                className="cursor-pointer w-8 h-8 flex items-center justify-center border rounded-full text-lg hover:bg-gray-200 transition"
               >
                 −
-              </span>
+              </button>
 
               <span className="px-2">{item.quantity}</span>
 
-              <span
+              <button
                 onClick={() => dispatch(addToCart(item))}
                 className="
     cursor-pointer
@@ -104,7 +100,7 @@ const Checkout = () => {
   "
               >
                 +
-              </span>
+              </button>
             </div>
 
             {/* price */}
@@ -112,7 +108,9 @@ const Checkout = () => {
 
             {/* remove */}
             <div
-              onClick={() => dispatch(removeFromCart(item.id))}
+              onClick={() =>
+                dispatch(removeFromCart({ id: item.id, uid: user.uid }))
+              }
               className="flex justify-center"
             >
               <CloseIcon className="cursor-pointer" />
@@ -127,7 +125,9 @@ const Checkout = () => {
           </div>
         </div>
         {/* pYMENT */}
-        <CheckoutForm amount={totalPrice} />
+        <Elements stripe={stripePromise}>
+          <CheckoutForm amount={totalPrice} />
+        </Elements>
       </div>
     </div>
   );

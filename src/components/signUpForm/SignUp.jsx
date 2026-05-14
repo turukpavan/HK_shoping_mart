@@ -1,11 +1,10 @@
-import React, { useContext, useState } from "react";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
-import { auth, db } from "../../utils/firebase/firebase.utils";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "../button/Button";
-import FormInput from "../form-input/FormInput";
 import toast from "react-hot-toast";
+import FormInput from "../formInput/FormInput";
+import { registerUser } from "../../services/authService";
+import { getFirebaseErrorMessage } from "../../utils/firebase/firebaseErrors.utils";
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -14,6 +13,13 @@ const SignUp = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const resetForm = () => {
+    setName("");
+    setEmail("");
+    setPassword("");
+    setConfirmPassword("");
+  };
   const handleSignUp = async (e) => {
     e.preventDefault();
 
@@ -22,43 +28,22 @@ const SignUp = () => {
 
       return;
     }
+    if (password.length < 6) {
+  toast.error("Password must be at least 6 characters");
+  return;
+}
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password,
-      );
+      setLoading(true);
+      await registerUser({name :name.trim(), email : email.trim(), password});
 
-      const user = userCredential.user;
-
-      await setDoc(doc(db, "users", user.uid), {
-        name,
-        email,
-        uid: user.uid,
-      });
-
-      setName("");
-      setEmail("");
-      setPassword("");
-      setConfirmPassword("");
+      resetForm();
       navigate("/categories");
-      toast.success("Login successful");
+      toast.success("Account Created successfully");
     } catch (error) {
-      switch (error.code) {
-        case "auth/email-already-in-use":
-          toast.error("Email already exists. Please sign in.");
-          break;
-        case "auth/invalid-email":
-          toast.error("Invalid email address");
-          break;
-        case "auth/weak-password":
-          toast.error("Password should be at least 6 characters");
-          break;
-
-        default:
-          toast.error(error.message);
-      }
+      getFirebaseErrorMessage(error.code);
+    }finally{
+      setLoading(false);
     }
   };
 
@@ -98,7 +83,7 @@ const SignUp = () => {
         />
 
         <Button type="submit" className="w-fit mt-4">
-          SIGN UP
+           {loading ? "Creating Account..." : "SIGN UP"}
         </Button>
       </form>
     </div>

@@ -1,16 +1,16 @@
-import React, { memo, useCallback } from "react";
+import { memo, useCallback } from "react";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { Link, useNavigate } from "react-router-dom";
 import { auth } from "../../utils/firebase/firebase.utils";
 import { signOut } from "firebase/auth";
-import CartDropDown from "../cart-dropdown/CartDropdown";
 import { useDispatch, useSelector } from "react-redux";
-import { logoutUser } from "../../actions/userActions";
+import CartDropdown from "../cartDropdown/CartDropdown";
+import { logoutUser } from "../../redux/actions/userActions";
 
 const Header = () => {
   const user = useSelector((state) => state.Users.userData);
   const navigate = useNavigate();
-  const dispatch= useDispatch()
+  const dispatch = useDispatch();
 
   const handleUserLogin = useCallback(async () => {
     try {
@@ -19,11 +19,10 @@ const Header = () => {
         dispatch(logoutUser());
         navigate("/");
       }
-
     } catch (error) {
       console.error(error);
     }
-  }, [navigate,user]);
+  }, [navigate, user]);
 
   const handleNavigateCategories = useCallback(() => {
     navigate("/categories");
@@ -52,7 +51,7 @@ const Header = () => {
         {/* cart popup */}
         <div className="relative group cursor-pointer">
           <ShoppingCartIcon />
-          <CartDropDown />
+          <CartDropdown />
         </div>
       </section>
     </div>

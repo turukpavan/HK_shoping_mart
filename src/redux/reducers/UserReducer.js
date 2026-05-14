@@ -4,15 +4,16 @@ export const initialState = {
 
 export const userReducer = (state = initialState, action) => {
   switch (action.type) {
-
     case "SET_USER":
       return {
-        ...state, userData: action.payload,
+        ...state,
+        userData: action.payload,
       };
 
     case "LOGOUT_USER":
       return {
-        ...state, userData: null,
+        ...state,
+        userData: null,
       };
 
     default:

@@ -1,4 +1,4 @@
-import React, { memo } from 'react'
+import { memo } from "react";
 
 const Button = ({
   children,
@@ -6,7 +6,7 @@ const Button = ({
   onClick,
   className = "",
   bg = "bg-black",
-  text = "text-white"
+  text = "text-white",
 }) => {
   return (
     <button
@@ -16,7 +16,7 @@ const Button = ({
     >
       {children}
     </button>
-  )
-}
+  );
+};
 
-export default memo(Button)
+export default memo(Button);

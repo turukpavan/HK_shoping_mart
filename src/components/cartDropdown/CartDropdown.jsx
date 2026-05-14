@@ -1,14 +1,13 @@
-import React, { memo, useCallback } from "react";
+import { memo } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "../button/Button";
 import { useSelector } from "react-redux";
-import RemoveShoppingCartIcon from '@mui/icons-material/RemoveShoppingCart';
+import RemoveShoppingCartIcon from "@mui/icons-material/RemoveShoppingCart";
+import { selectUserCartItems } from "../../redux/selectors/cartSelectors";
 
 const CartDropDown = () => {
-   const user = useSelector(state=>state.Users.userData)
-    const cartData = useSelector((state)=>state.Cart.cartItems);
-    const cartItems = cartData.filter((cartitem)=>cartitem.uid == user?.uid)
-  
+  const cartItems = useSelector(selectUserCartItems)
+
   const navigate = useNavigate();
 
   return (
@@ -50,12 +49,11 @@ const CartDropDown = () => {
             </div>
           ))
         ) : (
-          <div className="flex flex-col items-center">
-
-           <RemoveShoppingCartIcon sx={{ fontSize: 50 }} />
-          <p className="text-center text-gray-500 text-sm">
-            Your cart is empty
-          </p>
+          <div className="flex flex-col items-center py-6">
+            <RemoveShoppingCartIcon sx={{ fontSize: 50 }} />
+            <p className="text-center text-gray-500 text-sm">
+              Your cart is empty
+            </p>
           </div>
         )}
       </div>

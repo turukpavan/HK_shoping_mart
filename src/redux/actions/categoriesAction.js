@@ -1,6 +1,6 @@
 export const getCategories = ()=>{
     return {
-        type :GET_CATEGORIES,
+        type : "GET_CATEGORIES",
         
     }
 }

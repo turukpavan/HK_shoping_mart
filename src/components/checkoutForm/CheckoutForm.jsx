@@ -5,69 +5,90 @@ import {
   useStripe,
   useElements,
 } from "@stripe/react-stripe-js";
+
 import { useCallback, useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
+import { clearCart } from "../../redux/actions/cartAction";
 
-
-const CheckoutForm = ({amount}) => {
-  const cartItems = useSelector(state=>state.Cart.cartItems);
-    const userData = useSelector((state)=>state.Users.userData) ;
-    const dispatch = useDispatch()
-  
- 
+const CheckoutForm = ({ amount }) => {
+  const userData = useSelector((state) => state.Users.userData);
+  const dispatch = useDispatch();
   const stripe = useStripe();
   const elements = useElements();
   const [loading, setLoading] = useState(false);
 
   const handlePay = useCallback(async () => {
-       try {
-    setLoading(true);
+    if (loading) return;
 
-    // 1. CREATE PAYMENT INTENT
-    const res = await fetch(
-      "/.netlify/functions/createPaymentIntent",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          amount: amount,
-        }),
-      }
-    );
-
-    const data = await res.json();
-
-    // 2. CONFIRM PAYMENT
-    const result = await stripe.confirmCardPayment(
-      data.paymentIntent.client_secret,
-      {
-        payment_method: {
-          card: elements.getElement(CardNumberElement),
-          billing_details: {
-            name: userData?.name 
-          },
-        },
-      }
-    );
-
-    if (result.error) {
-      toast.error(result.error)
-    } else if (
-      result.paymentIntent.status === "succeeded"
-    ) {
-      dispatch(clearCart());
-      toast.success("Payment Successful ");
+    if (!userData?.uid) {
+      toast.error("Please login to continue");
+      return;
     }
-  } catch (error) {
-      toast.error(error.message)
-  } finally {
-    setLoading(false);
-  }
-}, [stripe, elements, userData,amount, dispatch]);
- 
+
+    if (!stripe || !elements) {
+      toast.error("Stripe is not ready");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const res = await fetch(
+        "/.netlify/functions/createPaymentIntent",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ amount }),
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok || !data?.paymentIntent?.client_secret) {
+        console.error("Payment Intent Error:", data);
+        toast.error(
+          data?.message || "Failed to create payment intent"
+        );
+        return;
+      }
+
+      const cardElement =
+        elements?.getElement(CardNumberElement);
+
+      if (!cardElement) {
+        toast.error("Card details not found");
+        return;
+      }
+
+      const result = await stripe.confirmCardPayment(
+        data.paymentIntent.client_secret,
+        {
+          payment_method: {
+            card: cardElement,
+            billing_details: {
+              name: userData?.name || "Guest",
+            },
+          },
+        }
+      );
+
+      if (result?.error) {
+        toast.error(result.error.message);
+      } else if (
+        result?.paymentIntent?.status === "succeeded"
+      ) {
+        dispatch(clearCart());
+        toast.success("Payment Successful");
+      }
+    } catch (error) {
+      toast.error(error?.message || "Payment failed");
+    } finally {
+      setLoading(false);
+    }
+  }, [stripe, elements, amount, userData, dispatch, loading]);
 
   return (
     <div className="w-full max-w-md p-5 border rounded">
@@ -75,12 +96,10 @@ const CheckoutForm = ({amount}) => {
         Credit Card Payment
       </h2>
 
-      {/* CARD NUMBER */}
       <div className="border p-2 mb-2">
         <CardNumberElement />
       </div>
 
-      {/* EXPIRY + CVC */}
       <div className="flex gap-2">
         <div className="border p-2 w-1/2">
           <CardExpiryElement />
@@ -90,11 +109,14 @@ const CheckoutForm = ({amount}) => {
         </div>
       </div>
 
-      {/* PAY BUTTON */}
       <button
         onClick={handlePay}
         disabled={!stripe || loading}
-        className="w-full mt-4 bg-black text-white py-2"
+        className={`w-full mt-4 py-2 text-white rounded transition ${
+          loading
+            ? "bg-gray-500 cursor-not-allowed"
+            : "bg-black"
+        }`}
       >
         {loading ? "Processing..." : "PAY NOW"}
       </button>

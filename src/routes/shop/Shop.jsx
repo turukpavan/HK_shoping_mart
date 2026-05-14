@@ -1,15 +1,22 @@
-import React, { useEffect, useMemo, useState } from "react";
 import { SHOP_DATA } from "../../db/shopData";
-import { Link, useParams } from "react-router-dom";
-import ProductCard from "../../components/product-card/ProductCard";
+import { useParams } from "react-router-dom";
+import ProductCard from "../../components/productCard/ProductCard";
 const Shop = () => {
   const { category } = useParams();
 
-  const products = useMemo(() => {
+  const products =() => {
     return SHOP_DATA.find(
-      (data) => data.title.toLowerCase() === category.toLowerCase(),
+      (data) => data.title.toLowerCase() === category?.toLowerCase(),
     );
-  }, [category]);
+  };
+
+  if (!products) {
+  return (
+    <h1 className="text-center mt-10 text-2xl">
+      Category not found
+    </h1>
+  );
+}
 
   return (
     <div>

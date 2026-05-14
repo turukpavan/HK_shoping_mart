@@ -1,54 +1,44 @@
-import React, { useEffect, useState } from "react";
-import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { auth, googleProvider } from "../../utils/firebase/firebase.utils";
-import FormInput from "../form-input/FormInput";
-import Button from "../button/Button";
 import toast from "react-hot-toast";
+
+import Button from "../button/Button";
+import FormInput from "../formInput/FormInput";
+import { loginWithEmail, loginWithGoogle } from "../../services/authService";
+import { getFirebaseErrorMessage } from "../../utils/firebase/firebaseErrors.utils";
+
 const SignIn = () => {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
- 
-
-  // EMAIL + PASSWORD LOGIN
   const handleSignIn = async (e) => {
     e.preventDefault();
 
     try {
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password,
-      );
+      await loginWithEmail(email, password);
 
       toast.success("Login successful ✅");
       navigate("/categories");
     } catch (error) {
-       if (error.code === "auth/invalid-credential") {
-      toast.error("Invalid credential");
-  } else {
-      toast.error("Login Fails");
-  }
+      getFirebaseErrorMessage(error.code);
+
       setEmail("");
-      setPassword("")
+      setPassword("");
     }
   };
 
-  // GOOGLE LOGIN
-  const signInWithGoogle = async () => {
-  try {
-    await signInWithPopup(auth, googleProvider);
-          toast.success("Login successful ✅");
+  const handleGoogleLogin = async () => {
+    try {
+      await loginWithGoogle();
 
+      toast.success("Login successful ✅");
       navigate("/categories");
-  } catch (error) {
-          toast.error(error.message);
-
-  }
-};
+    } catch (error) {
+      getFirebaseErrorMessage(error.code)
+    }
+  };
 
   return (
     <div>
@@ -71,11 +61,10 @@ const SignIn = () => {
           onChange={(e) => setPassword(e.target.value)}
         />
 
-
         <div className="flex gap-4 mt-4">
           <Button type="submit">SIGN IN</Button>
 
-          <Button type="button" bg="bg-blue-500" onClick={signInWithGoogle}>
+          <Button type="button" bg="bg-blue-500" onClick={handleGoogleLogin}>
             SIGN IN WITH GOOGLE
           </Button>
         </div>
